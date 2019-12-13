@@ -1,37 +1,24 @@
-Welcome to Glitch
+TensorFlow.js Skeleton
 =================
 
-Click `Show` in the header to see your app live. Updates to your code will instantly deploy and update live.
+This very simple skeleton simply loads in TensorFlow.js and prints out the version once loaded to the DOM.
 
-**Glitch** is the friendly community where you'll build the app of your dreams. Glitch lets you instantly create, remix, edit, and host an app, bot or site, and you can invite collaborators or helpers to simultaneously edit code with you.
+From these humble beginnings you can do some really great things. 
 
-Find out more [about Glitch](https://glitch.com/about).
+Feel free to fork this and use it as a quick way to start coding with TensorFlow.js.
 
 
 Your Project
 ------------
 
-### ← README.md
-
-That's this file, where you can tell people what your cool website does and how you built it.
-
 ### ← index.html
 
-Where you'll write the content of your website. 
+We simply have a script tag in our HTML to grab the latest version of TensorFlow.js
 
-### ← style.css
-
-CSS files add styling rules to your content.
 
 ### ← script.js
 
-If you're feeling fancy you can add interactivity to your site with JavaScript.
+This simply grabs a reference to a paragraph in the DOM and then prints out the TensorFlow.js version number to it once it is loaded.
 
-### ← assets
 
-Drag in `assets`, like images or music, to add them to your project
-
-Made by [Glitch](https://glitch.com/)
 -------------------
-
-\ ゜o゜)ノ
