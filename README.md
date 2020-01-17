@@ -27,6 +27,10 @@ However, if you want to pull in a particular version of TensorFlow.js you can do
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.4.0/dist/tf.min.js" type="text/javascript"></script>
 ```
 
+### ← style.css
+
+Nothing to see here. Just styles to make the demo look prettier. You can use or ignore these as you please.
+
 ### ← script.js
 
 This simply grabs a reference to a paragraph in the DOM and then prints out the TensorFlow.js version number to it once loaded.
