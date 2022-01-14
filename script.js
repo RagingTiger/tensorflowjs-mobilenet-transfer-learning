@@ -15,4 +15,34 @@
  * =============================================================================
  */
 
+const video = document.getElementById('webcam');
 
+// Check if webcam access is supported.
+function hasGetUserMedia() {
+  return !!(navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia);
+}
+
+// If webcam supported, add event listener to button for when user
+// wants to activate it.
+if (hasGetUserMedia()) {
+  const enableWebcamButton = document.getElementById('webcamButton');
+  enableWebcamButton.addEventListener('click', enableCam);
+} else {
+  console.warn('getUserMedia() is not supported by your browser');
+}
+
+
+// Enable the live webcam view and start classification.
+function enableCam(event) {
+  // getUsermedia parameters.
+  const constraints = {
+    video: true
+  };
+
+  // Activate the webcam stream.
+  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+    video.srcObject = stream;
+    video.addEventListener('loadeddata', predictWebcam);
+  });
+}
