@@ -38,7 +38,7 @@ model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
 // Compile the model with the defined optimizer and specify a loss function to use.
 model.compile({
   optimizer: 'adam', // Adam changes the learning rate over time which is useful.
-  loss: 'binaryCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
+  loss: 'categoricalCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
   metrics: ['accuracy']  // As this is a classifcation problem you can ask to record accuracy in the logs too!
 });
 
@@ -105,11 +105,11 @@ function dataGatherLoop() {
           [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
           true
       );
-      return mobilenet.predict(resizedTensorFrame.expandDims());
+      return mobilenet.predict(resizedTensorFrame.expandDims()).squeeze().arraySync();
     });
     
     trainingDataInputs.push(imageFeatures);
-    console.log(imageFeatures.size);
+    console.log(imageFeatures.length);
     trainingDataOutputs.push(gatherDataState);
     
     // Intialize array index element if currently undefined.
@@ -141,7 +141,7 @@ function gatherDataClass2() {
 async function trainAndPredict() {
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
 
-  let results = await model.fit(trainingDataInputs, oneHotOutputs, {
+  let results = await model.fit(tf.tensor2d(trainingDataInputs), oneHotOutputs, {
     shuffle: true,
     batchSize: 10,
     epochs: 50,
@@ -167,6 +167,6 @@ function predict() {
   });
 }
 
-function logProgress() {
-  
+function logProgress(epoch, logs) {
+  console.log('Data for epoch ' + epoch, logs);
 }
