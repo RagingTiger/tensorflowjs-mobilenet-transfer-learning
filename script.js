@@ -35,6 +35,8 @@ let model = tf.sequential();
 model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
 model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
 
+model.summary();
+
 // Compile the model with the defined optimizer and specify a loss function to use.
 model.compile({
   optimizer: 'adam', // Adam changes the learning rate over time which is useful.
@@ -51,6 +53,9 @@ let examplesCount = [];
 let predict = false;
 
 
+/**
+ * Loads the MobileNet model and warms it up so ready for use.
+ **/
 async function loadMobileNetFeatureModel() {
   mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
   STATUS.innerText = 'MobileNet v3 loaded successfully!';
@@ -63,13 +68,17 @@ async function loadMobileNetFeatureModel() {
 loadMobileNetFeatureModel();
 
 
-// Check if webcam access is supported.
+/**
+ * Check if getUserMedia is supported for webcam access.
+ **/
 function hasGetUserMedia() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
 
 
-// Enable the live webcam view and start classification.
+/**
+ * Loads the MobileNet model and warms it up so ready for use.
+ **/
 function enableCam() {
   if (hasGetUserMedia()) {
     // getUsermedia parameters.
