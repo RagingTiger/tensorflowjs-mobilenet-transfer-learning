@@ -109,7 +109,6 @@ function dataGatherLoop() {
     });
     
     trainingDataInputs.push(imageFeatures);
-    console.log(imageFeatures.length);
     trainingDataOutputs.push(gatherDataState);
     
     // Intialize array index element if currently undefined.
@@ -140,8 +139,9 @@ function gatherDataClass2() {
 
 async function trainAndPredict() {
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
-
-  let results = await model.fit(tf.tensor2d(trainingDataInputs), oneHotOutputs, {
+  let inputsAsTensors = tf.tensor2d(trainingDataInputs);
+  
+  let results = await model.fit(inputsAsTensors, oneHotOutputs, {
     shuffle: true,
     batchSize: 10,
     epochs: 50,
