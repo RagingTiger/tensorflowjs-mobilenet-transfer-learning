@@ -15,43 +15,66 @@
  * =============================================================================
  */
 
-const video = document.getElementById('webcam');
-const enableCamButton = document.getElementById('enableCam');
-const class1DataButton = document.getElementById('class1Data');
-const class2DataButton = document.getElementById('class2Data');
-const trainButton = document.getElementById('train');
+let model = undefined;
+let mobilenet = undefined;
+
+const STATUS = document.getElementById('status');
+const VIDEO = document.getElementById('webcam');
+const ENABLE_CAM_BUTTON = document.getElementById('enableCam');
+const CLASS_1_DATA_BUTTON = document.getElementById('class1Data');
+const CLASS_2_DATA_BUTTON = document.getElementById('class2Data');
+const TRAIN_BUTTON = document.getElementById('train');
+
+ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
+CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
+CLASS_1_DATA_BUTTON.addEventListener('mouseup', gatherDataClass1);
+
+CLASS_2_DATA_BUTTON.addEventListener('click', gatherDataClass2);
+TRAIN_BUTTON.addEventListener('click', trainAndPredict);
 
 
-enableCamButton.addEventListener('click', enableCam);
-class1DataButton.addEventListener('click', gatherDataClass1);
-class2DataButton.addEventListener('click', gatherDataClass2);
-trainButton.addEventListener('click', trainAndPredict);
+async function loadMobileNetFeatureModel() {
+  mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
+  STATUS.innerText = 'MobileNet v3 loaded successfully!';
+}
+
+loadMobileNetFeatureModel();
 
 
 // Check if webcam access is supported.
 function hasGetUserMedia() {
-  return !!(navigator.mediaDevices &&
-    navigator.mediaDevices.getUserMedia);
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
 
 
 // Enable the live webcam view and start classification.
 function enableCam() {
   if (hasGetUserMedia()) {
-    
-    
+    // getUsermedia parameters.
+    const constraints = {
+      video: true
+    };
+
+    // Activate the webcam stream.
+    navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+      VIDEO.srcObject = stream;
+    });
   } else {
     console.warn('getUserMedia() is not supported by your browser');
   }
-  
-  // getUsermedia parameters.
-  const constraints = {
-    video: true
-  };
+}
 
-  // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-    video.srcObject = stream;
-    video.addEventListener('loadeddata', predictWebcam);
-  });
+
+function gatherDataClass1() {
+  
+}
+
+
+function gatherDataClass2() {
+  
+}
+
+
+function trainAndPredict() {
+  
 }
