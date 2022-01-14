@@ -223,8 +223,8 @@ function predictLoop() {
 
 /**
  * Purge data and start over. Note this does not dispose of the loaded 
- * MobileNet model and MLP head which consists of 187 tensors as you will
- * need to resuse them to train a new model.
+ * MobileNet model and MLP head tensors as you will need to resuse 
+ * them to train a new model.
  **/
 function reset() {
   predict = false;
