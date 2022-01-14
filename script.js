@@ -34,6 +34,8 @@ let model = undefined;
 let mobilenet = undefined;
 let gather_data_state = 0;
 let videoPlaying = false;
+let trainingDataInputs = [];
+let trainingDataOutputs = [];
 
 
 async function loadMobileNetFeatureModel() {
@@ -61,8 +63,9 @@ function enableCam() {
     // Activate the webcam stream.
     navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
       VIDEO.srcObject = stream;
-      video.addEventListener('loadeddata', function() {
+      VIDEO.addEventListener('loadeddata', function() {
         videoPlaying = true;
+        ENABLE_CAM_BUTTON.classList.add('removed');
       });
     });
   } else {
@@ -73,11 +76,12 @@ function enableCam() {
 
 function dataGatherLoop() {
   // Only gather data if webcam is on and working.
-  if (videoPlaying) {
-    // Ensure tensors are cleaned up
+  if (videoPlaying && gather_data_state !== 0) {
+    // Ensure tensors are cleaned up.
     tf.tidy(function() {
+      let normalize
       let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
-      videoFrame.print();
+      videoFrameAsTensor.print();
     });
 
     window.requestAnimationFrame(dataGatherLoop);
@@ -87,16 +91,13 @@ function dataGatherLoop() {
 
 function gatherDataClass1() {
   gather_data_state = (gather_data_state === 0) ? 1 : 0;
-  
-  if(gather_data_state !== 0) {
-    dataGatherLoop();
-  }
+  dataGatherLoop();
 }
 
 
 function gatherDataClass2() {
   gather_data_state = (gather_data_state === 0) ? 2 : 0;
-  console.log(gather_data_state);
+  dataGatherLoop();
 }
 
 

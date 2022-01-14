@@ -33,3 +33,13 @@ video, button {
   display: block;
   margin: 10px;
 }
+
+video {
+  background: #FF9800;
+  width: 640px;
+  height: 480px;
+}
+
+.removed {
+  display: none;
+}
