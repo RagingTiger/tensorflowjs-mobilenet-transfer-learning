@@ -189,8 +189,11 @@ function predictLoop() {
       );
 
       let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims());
-      let prediction = model.predict(imageFeatures);
-      prediction.print();
+      let prediction = model.predict(imageFeatures).squeeze();
+      let highestIndex = prediction.argMax().arraySync();
+      let predictionArray = prediction.arraySync();
+
+      STATUS.innerText = 'Prediction: ' + highestIndex + ' with ' + (predictionArray[highestIndex] * 100)+ '% confidence';
     });
 
     window.requestAnimationFrame(predictLoop);
