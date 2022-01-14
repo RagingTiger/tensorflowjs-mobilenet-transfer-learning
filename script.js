@@ -42,7 +42,7 @@ model.compile({
 });
 
 let mobilenet = undefined;
-let gatherDataState = 0;
+let gatherDataState = -1;
 let videoPlaying = false;
 let trainingDataInputs = [];
 let trainingDataOutputs = [];
@@ -123,7 +123,7 @@ function dataGatherLoop() {
     
     // Increment counts of examples for user interface to show.
     examplesCount[gatherDataState]++;
-    STATUS.innerText = 'Class 1 Data count: ' + examplesCount[1] + ', Class 2 Data count: ' + examplesCount[2];
+    STATUS.innerText = 'Class 1 Data count: ' + examplesCount[0] + ', Class 2 Data count: ' + examplesCount[1];
 
     window.requestAnimationFrame(dataGatherLoop);
   }
@@ -131,13 +131,13 @@ function dataGatherLoop() {
 
 
 function gatherDataClass1() {
-  gatherDataState = (gatherDataState === 0) ? 0 : -1;
+  gatherDataState = (gatherDataState === -1) ? 0 : -1;
   dataGatherLoop();
 }
 
 
 function gatherDataClass2() {
-  gatherDataState = (gatherDataState === 0) ? 1 : -1;
+  gatherDataState = (gatherDataState === -1) ? 1 : -1;
   dataGatherLoop();
 }
 
