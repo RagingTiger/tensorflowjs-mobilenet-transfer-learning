@@ -15,9 +15,6 @@
  * =============================================================================
  */
 
-let model = undefined;
-let mobilenet = undefined;
-
 const STATUS = document.getElementById('status');
 const VIDEO = document.getElementById('webcam');
 const ENABLE_CAM_BUTTON = document.getElementById('enableCam');
@@ -29,8 +26,14 @@ ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
 CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
 CLASS_1_DATA_BUTTON.addEventListener('mouseup', gatherDataClass1);
 
-CLASS_2_DATA_BUTTON.addEventListener('click', gatherDataClass2);
+CLASS_2_DATA_BUTTON.addEventListener('mousedown', gatherDataClass2);
+CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
+
+let model = undefined;
+let mobilenet = undefined;
+let gather_data_state = 0;
+let videoPlaying = false;
 
 
 async function loadMobileNetFeatureModel() {
@@ -58,6 +61,9 @@ function enableCam() {
     // Activate the webcam stream.
     navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
       VIDEO.srcObject = stream;
+      video.addEventListener('loadeddata', function() {
+        videoPlaying = true;
+      });
     });
   } else {
     console.warn('getUserMedia() is not supported by your browser');
@@ -65,13 +71,32 @@ function enableCam() {
 }
 
 
+function dataGatherLoop() {
+  // Only gather data if webcam is on and working.
+  if (videoPlaying) {
+    // Ensure tensors are cleaned up
+    tf.tidy(function() {
+      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
+      videoFrame.print();
+    });
+
+    window.requestAnimationFrame(dataGatherLoop);
+  }
+}
+
+
 function gatherDataClass1() {
+  gather_data_state = (gather_data_state === 0) ? 1 : 0;
   
+  if(gather_data_state !== 0) {
+    dataGatherLoop();
+  }
 }
 
 
 function gatherDataClass2() {
-  
+  gather_data_state = (gather_data_state === 0) ? 2 : 0;
+  console.log(gather_data_state);
 }
 
 
