@@ -109,9 +109,9 @@ function dataGatherLoop() {
       
       let normalizedTensorFrame = resizedTensorFrame.div(255);
       
-      return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze().arraySync();
+      return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze();
     });
-    
+
     trainingDataInputs.push(imageFeatures);
     trainingDataOutputs.push(gatherDataState);
     
@@ -146,7 +146,7 @@ async function trainAndPredict() {
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
   
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
-  let inputsAsTensors = tf.tensor2d(trainingDataInputs);
+  let inputsAsTensors = tf.stack(trainingDataInputs);
   
   let results = await model.fit(inputsAsTensors, oneHotOutputs, {
     shuffle: true,
