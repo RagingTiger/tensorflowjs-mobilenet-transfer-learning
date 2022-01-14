@@ -97,15 +97,19 @@ function dataGatherLoop() {
   if (videoPlaying && gatherDataState !== 0) {
     // Ensure tensors are cleaned up.
     let imageFeatures = tf.tidy(function() {
-      // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
-      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
+      // Grab pixels from current VIDEO frame.
+      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
+      console.log(videoFrameAsTensor.shape);
       // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
       let resizedTensorFrame = tf.image.resizeBilinear(
           videoFrameAsTensor, 
           [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
           true
       );
-      return mobilenet.predict(resizedTensorFrame.expandDims()).squeeze().arraySync();
+      
+      let normalizedTensorFrame = resizedTensorFrame.div(255);
+      
+      return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze().arraySync();
     });
     
     trainingDataInputs.push(imageFeatures);
