@@ -96,7 +96,7 @@ function dataGatherLoop() {
   // Only gather data if webcam is on and working.
   if (videoPlaying && gatherDataState !== 0) {
     // Ensure tensors are cleaned up.
-    let prediction = tf.tidy(function() {
+    let imageFeatures = tf.tidy(function() {
       // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
       let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
       // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
@@ -108,8 +108,8 @@ function dataGatherLoop() {
       return mobilenet.predict(resizedTensorFrame.expandDims());
     });
     
-    trainingDataInputs.push(prediction);
-    console.log(prediction.size);
+    trainingDataInputs.push(imageFeatures);
+    console.log(imageFeatures.size);
     trainingDataOutputs.push(gatherDataState);
     
     // Intialize array index element if currently undefined.
@@ -120,8 +120,6 @@ function dataGatherLoop() {
     // Increment counts of examples for user interface to show.
     examplesCount[gatherDataState]++;
     STATUS.innerText = 'Class 1 Data count: ' + examplesCount[1] + ', Class 2 Data count: ' + examplesCount[2];
-    
-    prediction.print();
 
     window.requestAnimationFrame(dataGatherLoop);
   }
@@ -141,8 +139,34 @@ function gatherDataClass2() {
 
 
 async function trainAndPredict() {
-  tf.tidy({
+  let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
 
+  let results = await model.fit(trainingDataInputs, oneHotOutputs, {
+    shuffle: true,
+    batchSize: 10,
+    epochs: 50,
+    callbacks: {onEpochEnd: logProgress}
   });
+
+  predict();
+}
+
+function predict() {
+  tf.tidy(function() {
+    // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
+    let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
+    // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
+    let resizedTensorFrame = tf.image.resizeBilinear(
+        videoFrameAsTensor, 
+        [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
+        true
+    );
+
+    let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims());
+    let prediction = model.predict(imageFeatures);
+  });
+}
+
+function logProgress() {
   
 }
