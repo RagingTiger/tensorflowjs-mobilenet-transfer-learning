@@ -20,17 +20,22 @@ const VIDEO = document.getElementById('webcam');
 const ENABLE_CAM_BUTTON = document.getElementById('enableCam');
 const CLASS_1_DATA_BUTTON = document.getElementById('class1Data');
 const CLASS_2_DATA_BUTTON = document.getElementById('class2Data');
+const RESET_BUTTON = document.getElementById('reset');
 const TRAIN_BUTTON = document.getElementById('train');
 const MOBILE_NET_INPUT_WIDTH = 224;
 const MOBILE_NET_INPUT_HEIGHT = 224;
 const STOP_DATA_GATHER = -1;
 
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
-CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
-CLASS_1_DATA_BUTTON.addEventListener('mouseup', gatherDataClass1);
-CLASS_2_DATA_BUTTON.addEventListener('mousedown', gatherDataClass2);
-CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
+
+let dataCollectorButtons = document.querySelectorAll('button.dataCollector');
+for (let i = 0; i < dataCollectorButtons.length; i++) {
+  dataCollectorButtons[i].addEventListener('mousedown', gatherDataForClass);
+  dataCollectorButtons[i].addEventListener('mouseup', gatherDataForClass);
+}
+
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
+RESET_BUTTON.addEventListener('click', reset);
 
 let model = tf.sequential();
 model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
@@ -147,8 +152,8 @@ function dataGatherLoop() {
  * Handle Data Gather for button mouseup/mousedown.
  **/
 function gatherDataForClass() {
-  let
-  gatherDataState = (gatherDataState === STOP_DATA_GATHER) ? 0 : STOP_DATA_GATHER;
+  let classNumber = parseInt(this.getAttribute('data-class'));
+  gatherDataState = (gatherDataState === STOP_DATA_GATHER) ? classNumber : STOP_DATA_GATHER;
   dataGatherLoop();
 }
 
@@ -194,4 +199,13 @@ function predictLoop() {
 
 function logProgress(epoch, logs) {
   console.log('Data for epoch ' + epoch, logs);
+}
+
+
+function reset() {
+  predict = false;
+  examplesCount.splice(0);
+  trainingDataInputs.splice(0);
+  trainingDataOutputs.splice(0);
+  STATUS.innerText = STATUS.innerText = 'Class 1 Data count: 0, Class 2 Data count: 0';
 }
