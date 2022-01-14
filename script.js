@@ -57,7 +57,9 @@ function enableCam() {
   if (hasGetUserMedia()) {
     // getUsermedia parameters.
     const constraints = {
-      video: true
+      video: true,
+      width: 640, 
+      height: 480 
     };
 
     // Activate the webcam stream.
@@ -79,9 +81,10 @@ function dataGatherLoop() {
   if (videoPlaying && gather_data_state !== 0) {
     // Ensure tensors are cleaned up.
     tf.tidy(function() {
-      let normalize
-      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
-      videoFrameAsTensor.print();
+      // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
+      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
+      let resizedTensorFrame = tf.image.resizeBilinear(videoFrameAsTensor, [128, 128] ,true);
+      resizedTensorFrame.print();
     });
 
     window.requestAnimationFrame(dataGatherLoop);
