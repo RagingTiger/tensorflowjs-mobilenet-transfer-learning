@@ -46,3 +46,7 @@ button {
 .removed {
   display: none;
 }
+
+#status {
+  font-size:150%;
+}

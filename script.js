@@ -158,12 +158,14 @@ function gatherDataForClass() {
 }
 
 
+/**
+ * Once data collected actually perform the transfer learning.
+ **/
 async function trainAndPredict() {
   predict = false;
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
 
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
-
   let inputsAsTensors = tf.stack(trainingDataInputs);
   
   let results = await model.fit(inputsAsTensors, oneHotOutputs, {
@@ -172,10 +174,26 @@ async function trainAndPredict() {
     epochs: 10,
     callbacks: {onEpochEnd: logProgress}
   });
+  
+  oneHotOutputs.dispose();
+  inputsAsTensors.dispose();
+  
   predict = true;
   predictLoop();
 }
 
+
+/**
+ * Log training progress.
+ **/
+function logProgress(epoch, logs) {
+  console.log('Data for epoch ' + epoch, logs);
+}
+
+
+/**
+ *  Make live predictions from webcam once trained.
+ **/
 function predictLoop() {
   if(predict) {
     tf.tidy(function() {
@@ -193,22 +211,25 @@ function predictLoop() {
       let highestIndex = prediction.argMax().arraySync();
       let predictionArray = prediction.arraySync();
 
-      STATUS.innerText = 'Prediction: ' + highestIndex + ' with ' + (predictionArray[highestIndex] * 100)+ '% confidence';
+      STATUS.innerText = 'Prediction: ' + highestIndex + ' with ' + Math.floor(predictionArray[highestIndex] * 100) + '% confidence';
     });
-
+console.log('Tensors in memory: ' + tf.memory().numTensors);
     window.requestAnimationFrame(predictLoop);
   }
 }
 
-function logProgress(epoch, logs) {
-  console.log('Data for epoch ' + epoch, logs);
-}
 
-
+/**
+ *  Purge data and start over.
+ **/
 function reset() {
   predict = false;
   examplesCount.splice(0);
+  for (let i = 0; i < trainingDataInputs.length; i++) {
+    trainingDataInputs[i].dispose();
+  }
   trainingDataInputs.splice(0);
   trainingDataOutputs.splice(0);
   STATUS.innerText = STATUS.innerText = 'Class 1 Data count: 0, Class 2 Data count: 0';
+  console.log('Tensors in memory: ' + tf.memory().numTensors);
 }
