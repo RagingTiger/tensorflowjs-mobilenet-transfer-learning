@@ -94,7 +94,7 @@ function enableCam() {
 
 function dataGatherLoop() {
   // Only gather data if webcam is on and working.
-  if (videoPlaying && gatherDataState !== 0) {
+  if (videoPlaying && gatherDataState !== -1) {
     // Ensure tensors are cleaned up.
     let imageFeatures = tf.tidy(function() {
       // Grab pixels from current VIDEO frame.
@@ -114,6 +114,7 @@ function dataGatherLoop() {
 
     trainingDataInputs.push(imageFeatures);
     trainingDataOutputs.push(gatherDataState);
+    console.log(gatherDataState);
     
     // Intialize array index element if currently undefined.
     if (examplesCount[gatherDataState] === undefined) {
@@ -130,13 +131,13 @@ function dataGatherLoop() {
 
 
 function gatherDataClass1() {
-  gatherDataState = (gatherDataState === 0) ? 1 : 0;
+  gatherDataState = (gatherDataState === 0) ? 0 : -1;
   dataGatherLoop();
 }
 
 
 function gatherDataClass2() {
-  gatherDataState = (gatherDataState === 0) ? 2 : 0;
+  gatherDataState = (gatherDataState === 0) ? 1 : -1;
   dataGatherLoop();
 }
 
@@ -144,14 +145,15 @@ function gatherDataClass2() {
 async function trainAndPredict() {
   predict = false;
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
-  
+  console.log(trainingDataOutputs);
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
+  oneHotOutputs.print();
   let inputsAsTensors = tf.stack(trainingDataInputs);
   
   let results = await model.fit(inputsAsTensors, oneHotOutputs, {
     shuffle: true,
     batchSize: 10,
-    epochs: 50,
+    epochs: 20,
     callbacks: {onEpochEnd: logProgress}
   });
   predict = true;
