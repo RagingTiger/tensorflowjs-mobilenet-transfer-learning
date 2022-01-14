@@ -33,9 +33,14 @@ CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
 
 const model = tf.sequential();
-model.add(tf.layers.dense({inputShape: [784], units: 32, activation: 'relu'}));
-model.add(tf.layers.dense({units: 10, activation: 'softmax'}));
-
+model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
+model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
+// Compile the model with the defined optimizer and specify a loss function to use.
+model.compile({
+  optimizer: 'adam', // Adam changes the learning rate over time which is useful.
+  loss: 'binaryCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
+  metrics: ['accuracy']  // As this is a classifcation problem you can ask to record accuracy in the logs too!
+});
 
 let mobilenet = undefined;
 let gatherDataState = 0;
@@ -48,7 +53,7 @@ let examplesCount = [];
 async function loadMobileNetFeatureModel() {
   mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
   STATUS.innerText = 'MobileNet v3 loaded successfully!';
-  // Warm up the model by passing zeros through it.
+  // Warm up the model by passing zeros through it once.
   tf.tidy(function () {
     mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
   });
@@ -104,6 +109,7 @@ function dataGatherLoop() {
     });
     
     trainingDataInputs.push(prediction);
+    console.log(prediction.size);
     trainingDataOutputs.push(gatherDataState);
     
     // Intialize array index element if currently undefined.
@@ -134,6 +140,9 @@ function gatherDataClass2() {
 }
 
 
-function trainAndPredict() {
+async function trainAndPredict() {
+  tf.tidy({
+
+  });
   
 }
