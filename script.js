@@ -21,6 +21,8 @@ const ENABLE_CAM_BUTTON = document.getElementById('enableCam');
 const CLASS_1_DATA_BUTTON = document.getElementById('class1Data');
 const CLASS_2_DATA_BUTTON = document.getElementById('class2Data');
 const TRAIN_BUTTON = document.getElementById('train');
+const MOBILE_NET_INPUT_WIDTH = 224;
+const MOBILE_NET_INPUT_HEIGHT = 224;
 
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
 CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
@@ -36,11 +38,16 @@ let gather_data_state = 0;
 let videoPlaying = false;
 let trainingDataInputs = [];
 let trainingDataOutputs = [];
+let examplesCount = [];
 
 
 async function loadMobileNetFeatureModel() {
   mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
   STATUS.innerText = 'MobileNet v3 loaded successfully!';
+  // Warm up the model by passing zeros through it.
+  tf.tidy(function () {
+    mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
+  });
 }
 
 loadMobileNetFeatureModel();
@@ -80,12 +87,23 @@ function dataGatherLoop() {
   // Only gather data if webcam is on and working.
   if (videoPlaying && gather_data_state !== 0) {
     // Ensure tensors are cleaned up.
-    tf.tidy(function() {
+    let prediction = tf.tidy(function() {
       // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
       let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
-      let resizedTensorFrame = tf.image.resizeBilinear(videoFrameAsTensor, [128, 128] ,true);
-      resizedTensorFrame.print();
+      // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
+      let resizedTensorFrame = tf.image.resizeBilinear(
+          videoFrameAsTensor, 
+          [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
+          true
+      );
+      return mobilenet.predict(resizedTensorFrame.expandDims());
     });
+    
+    trainingDataInputs.push(prediction);
+    trainingDataOutputs.push(gather_data_state);
+    examplesCount[]
+    
+    prediction.print();
 
     window.requestAnimationFrame(dataGatherLoop);
   }
