@@ -27,7 +27,6 @@ const MOBILE_NET_INPUT_HEIGHT = 224;
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
 CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
 CLASS_1_DATA_BUTTON.addEventListener('mouseup', gatherDataClass1);
-
 CLASS_2_DATA_BUTTON.addEventListener('mousedown', gatherDataClass2);
 CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
