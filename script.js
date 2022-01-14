@@ -31,9 +31,10 @@ CLASS_2_DATA_BUTTON.addEventListener('mousedown', gatherDataClass2);
 CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
 
-const model = tf.sequential();
+let model = tf.sequential();
 model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
 model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
+
 // Compile the model with the defined optimizer and specify a loss function to use.
 model.compile({
   optimizer: 'adam', // Adam changes the learning rate over time which is useful.
