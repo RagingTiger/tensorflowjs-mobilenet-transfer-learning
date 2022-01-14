@@ -23,6 +23,7 @@ const CLASS_2_DATA_BUTTON = document.getElementById('class2Data');
 const TRAIN_BUTTON = document.getElementById('train');
 const MOBILE_NET_INPUT_WIDTH = 224;
 const MOBILE_NET_INPUT_HEIGHT = 224;
+const STOP_DATA_GATHER = -1;
 
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
 CLASS_1_DATA_BUTTON.addEventListener('mousedown', gatherDataClass1);
@@ -77,7 +78,7 @@ function hasGetUserMedia() {
 
 
 /**
- * Loads the MobileNet model and warms it up so ready for use.
+ * Enable the webcam with video constraints applied.
  **/
 function enableCam() {
   if (hasGetUserMedia()) {
@@ -102,9 +103,12 @@ function enableCam() {
 }
 
 
+/**
+ * When a button used to gather data is pressed, record feature vectors along with class type to arrays.
+ **/
 function dataGatherLoop() {
-  // Only gather data if webcam is on and working.
-  if (videoPlaying && gatherDataState !== -1) {
+  // Only gather data if webcam is on and a relevent button is pressed.
+  if (videoPlaying && gatherDataState !== STOP_DATA_GATHER) {
     // Ensure tensors are cleaned up.
     let imageFeatures = tf.tidy(function() {
       // Grab pixels from current VIDEO frame.
@@ -124,7 +128,6 @@ function dataGatherLoop() {
 
     trainingDataInputs.push(imageFeatures);
     trainingDataOutputs.push(gatherDataState);
-    console.log(gatherDataState);
     
     // Intialize array index element if currently undefined.
     if (examplesCount[gatherDataState] === undefined) {
@@ -140,14 +143,12 @@ function dataGatherLoop() {
 }
 
 
-function gatherDataClass1() {
-  gatherDataState = (gatherDataState === -1) ? 0 : -1;
-  dataGatherLoop();
-}
-
-
-function gatherDataClass2() {
-  gatherDataState = (gatherDataState === -1) ? 1 : -1;
+/**
+ * Handle Data Gather for button mouseup/mousedown.
+ **/
+function gatherDataForClass() {
+  let
+  gatherDataState = (gatherDataState === STOP_DATA_GATHER) ? 0 : STOP_DATA_GATHER;
   dataGatherLoop();
 }
 
@@ -155,15 +156,15 @@ function gatherDataClass2() {
 async function trainAndPredict() {
   predict = false;
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
-  console.log(trainingDataOutputs);
+
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
-  oneHotOutputs.print();
+
   let inputsAsTensors = tf.stack(trainingDataInputs);
   
   let results = await model.fit(inputsAsTensors, oneHotOutputs, {
     shuffle: true,
-    batchSize: 10,
-    epochs: 20,
+    batchSize: 5,
+    epochs: 10,
     callbacks: {onEpochEnd: logProgress}
   });
   predict = true;
