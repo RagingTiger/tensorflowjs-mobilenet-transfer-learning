@@ -32,9 +32,13 @@ CLASS_2_DATA_BUTTON.addEventListener('mousedown', gatherDataClass2);
 CLASS_2_DATA_BUTTON.addEventListener('mouseup', gatherDataClass2);
 TRAIN_BUTTON.addEventListener('click', trainAndPredict);
 
-let model = undefined;
+const model = tf.sequential();
+model.add(tf.layers.dense({inputShape: [784], units: 32, activation: 'relu'}));
+model.add(tf.layers.dense({units: 10, activation: 'softmax'}));
+
+
 let mobilenet = undefined;
-let gather_data_state = 0;
+let gatherDataState = 0;
 let videoPlaying = false;
 let trainingDataInputs = [];
 let trainingDataOutputs = [];
@@ -85,7 +89,7 @@ function enableCam() {
 
 function dataGatherLoop() {
   // Only gather data if webcam is on and working.
-  if (videoPlaying && gather_data_state !== 0) {
+  if (videoPlaying && gatherDataState !== 0) {
     // Ensure tensors are cleaned up.
     let prediction = tf.tidy(function() {
       // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
@@ -100,8 +104,16 @@ function dataGatherLoop() {
     });
     
     trainingDataInputs.push(prediction);
-    trainingDataOutputs.push(gather_data_state);
-    examplesCount[]
+    trainingDataOutputs.push(gatherDataState);
+    
+    // Intialize array index element if currently undefined.
+    if (examplesCount[gatherDataState] === undefined) {
+      examplesCount[gatherDataState] = 0;
+    }
+    
+    // Increment counts of examples for user interface to show.
+    examplesCount[gatherDataState]++;
+    STATUS.innerText = 'Class 1 Data count: ' + examplesCount[1] + ', Class 2 Data count: ' + examplesCount[2];
     
     prediction.print();
 
@@ -111,13 +123,13 @@ function dataGatherLoop() {
 
 
 function gatherDataClass1() {
-  gather_data_state = (gather_data_state === 0) ? 1 : 0;
+  gatherDataState = (gatherDataState === 0) ? 1 : 0;
   dataGatherLoop();
 }
 
 
 function gatherDataClass2() {
-  gather_data_state = (gather_data_state === 0) ? 2 : 0;
+  gatherDataState = (gatherDataState === 0) ? 2 : 0;
   dataGatherLoop();
 }
 
