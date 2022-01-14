@@ -38,7 +38,7 @@ model.add(tf.layers.dense({units: 2, activation: 'softmax'}));
 // Compile the model with the defined optimizer and specify a loss function to use.
 model.compile({
   optimizer: 'adam', // Adam changes the learning rate over time which is useful.
-  loss: 'categoricalCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
+  loss: 'binaryCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
   metrics: ['accuracy']  // As this is a classifcation problem you can ask to record accuracy in the logs too!
 });
 
@@ -142,6 +142,9 @@ function gatherDataClass2() {
 
 
 async function trainAndPredict() {
+  
+  tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
+  
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
   let inputsAsTensors = tf.tensor2d(trainingDataInputs);
   
