@@ -25,6 +25,7 @@ const TRAIN_BUTTON = document.getElementById('train');
 const MOBILE_NET_INPUT_WIDTH = 224;
 const MOBILE_NET_INPUT_HEIGHT = 224;
 const STOP_DATA_GATHER = -1;
+const CLASS_NAMES = ['Class 1', 'Class 2'];
 
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
 
@@ -118,7 +119,6 @@ function dataGatherLoop() {
     let imageFeatures = tf.tidy(function() {
       // Grab pixels from current VIDEO frame.
       let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
-      console.log(videoFrameAsTensor.shape);
       // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
       let resizedTensorFrame = tf.image.resizeBilinear(
           videoFrameAsTensor, 
@@ -165,18 +165,20 @@ async function trainAndPredict() {
   predict = false;
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
 
-  let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
-  let inputsAsTensors = tf.stack(trainingDataInputs);
+  let outputsAsTensor = tf.tensor1d(trainingDataOutputs, 'int32');
+  let oneHotOutputs = tf.oneHot(outputsAsTensor, 2);
+  let inputsAsTensor = tf.stack(trainingDataInputs);
   
-  let results = await model.fit(inputsAsTensors, oneHotOutputs, {
+  let results = await model.fit(inputsAsTensor, oneHotOutputs, {
     shuffle: true,
     batchSize: 5,
     epochs: 10,
     callbacks: {onEpochEnd: logProgress}
   });
   
+  outputsAsTensor.dispose();
   oneHotOutputs.dispose();
-  inputsAsTensors.dispose();
+  inputsAsTensor.dispose();
   
   predict = true;
   predictLoop();
@@ -211,16 +213,18 @@ function predictLoop() {
       let highestIndex = prediction.argMax().arraySync();
       let predictionArray = prediction.arraySync();
 
-      STATUS.innerText = 'Prediction: ' + highestIndex + ' with ' + Math.floor(predictionArray[highestIndex] * 100) + '% confidence';
+      STATUS.innerText = 'Prediction: ' + CLASS_NAMES[highestIndex] + ' with ' + Math.floor(predictionArray[highestIndex] * 100) + '% confidence';
     });
-console.log('Tensors in memory: ' + tf.memory().numTensors);
+
     window.requestAnimationFrame(predictLoop);
   }
 }
 
 
 /**
- *  Purge data and start over.
+ * Purge data and start over. Note this does not dispose of the loaded 
+ * MobileNet model and MLP head which consists of 187 tensors as you will
+ * need to resuse them to train a new model.
  **/
 function reset() {
   predict = false;
@@ -231,5 +235,6 @@ function reset() {
   trainingDataInputs.splice(0);
   trainingDataOutputs.splice(0);
   STATUS.innerText = STATUS.innerText = 'Class 1 Data count: 0, Class 2 Data count: 0';
+  
   console.log('Tensors in memory: ' + tf.memory().numTensors);
 }
