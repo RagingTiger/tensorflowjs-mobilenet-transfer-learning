@@ -47,6 +47,7 @@ let videoPlaying = false;
 let trainingDataInputs = [];
 let trainingDataOutputs = [];
 let examplesCount = [];
+let predict = false;
 
 
 async function loadMobileNetFeatureModel() {
@@ -141,7 +142,7 @@ function gatherDataClass2() {
 
 
 async function trainAndPredict() {
-  
+  predict = false;
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
   
   let oneHotOutputs = tf.oneHot(tf.tensor1d(trainingDataOutputs, 'int32'), 2);
@@ -153,24 +154,29 @@ async function trainAndPredict() {
     epochs: 50,
     callbacks: {onEpochEnd: logProgress}
   });
-
-  predict();
+  predict = true;
+  predictLoop();
 }
 
-function predict() {
-  tf.tidy(function() {
-    // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
-    let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
-    // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
-    let resizedTensorFrame = tf.image.resizeBilinear(
-        videoFrameAsTensor, 
-        [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
-        true
-    );
+function predictLoop() {
+  if(predict) {
+    tf.tidy(function() {
+      // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
+      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
+      // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
+      let resizedTensorFrame = tf.image.resizeBilinear(
+          videoFrameAsTensor, 
+          [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
+          true
+      );
 
-    let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims());
-    let prediction = model.predict(imageFeatures);
-  });
+      let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims());
+      let prediction = model.predict(imageFeatures);
+      prediction.print();
+    });
+
+    window.requestAnimationFrame(predictLoop);
+  }
 }
 
 function logProgress(epoch, logs) {
