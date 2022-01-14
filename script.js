@@ -46,9 +46,13 @@ model.summary();
 
 // Compile the model with the defined optimizer and specify a loss function to use.
 model.compile({
-  optimizer: 'adam', // Adam changes the learning rate over time which is useful.
-  loss: 'binaryCrossentropy', // As this demo supports just 2 classes, this is a binary classification problem.
-  metrics: ['accuracy']  // As this is a classifcation problem you can ask to record accuracy in the logs too!
+  // Adam changes the learning rate over time which is useful.
+  optimizer: 'adam',
+  // As this demo supports just 2 classes, this is a binary classification problem. 
+  // Change to categoricalCrossentropy if more than 2 classes.
+  loss: 'binaryCrossentropy', 
+  // As this is a classifcation problem you can record accuracy in the logs too!
+  metrics: ['accuracy']  
 });
 
 let mobilenet = undefined;
