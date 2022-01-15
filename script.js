@@ -53,9 +53,9 @@ model.summary();
 model.compile({
   // Adam changes the learning rate over time which is useful.
   optimizer: 'adam',
-  // As this demo supports just 2 classes, this is a binary classification problem. 
-  // Change to categoricalCrossentropy if more than 2 classes.
-  loss: 'binaryCrossentropy', 
+  // Use the correct loss function. If 2 classes of data, must use binaryCrossentropy.
+  // Else categoricalCrossentropy is used if more than 2 classes.
+  loss: (dataCollectorButtons.length) === 2 ? 'binaryCrossentropy': 'categoricalCrossentropy', 
   // As this is a classifcation problem you can record accuracy in the logs too!
   metrics: ['accuracy']  
 });
@@ -67,6 +67,7 @@ model.compile({
 async function loadMobileNetFeatureModel() {
   mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
   STATUS.innerText = 'MobileNet v3 loaded successfully!';
+  
   // Warm up the model by passing zeros through it once.
   tf.tidy(function () {
     mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
