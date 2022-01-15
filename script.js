@@ -35,6 +35,13 @@ for (let i = 0; i < dataCollectorButtons.length; i++) {
   dataCollectorButtons[i].addEventListener('mouseup', gatherDataForClass);
 }
 
+let mobilenet = undefined;
+let gatherDataState = STOP_DATA_GATHER;
+let videoPlaying = false;
+let trainingDataInputs = [];
+let trainingDataOutputs = [];
+let examplesCount = [];
+let predict = false;
 
 let model = tf.sequential();
 model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
@@ -52,14 +59,6 @@ model.compile({
   // As this is a classifcation problem you can record accuracy in the logs too!
   metrics: ['accuracy']  
 });
-
-let mobilenet = undefined;
-let gatherDataState = -1;
-let videoPlaying = false;
-let trainingDataInputs = [];
-let trainingDataOutputs = [];
-let examplesCount = [];
-let predict = false;
 
 
 /**
