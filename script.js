@@ -226,7 +226,7 @@ function predictLoop() {
 
 /**
  * Purge data and start over. Note this does not dispose of the loaded 
- * MobileNet model and MLP head tensors as you will need to resuse 
+ * MobileNet model and MLP head tensors as you will need to reuse 
  * them to train a new model.
  **/
 function reset() {
@@ -237,7 +237,7 @@ function reset() {
   }
   trainingDataInputs.splice(0);
   trainingDataOutputs.splice(0);
-  STATUS.innerText = STATUS.innerText = 'Class 1 Data count: 0, Class 2 Data count: 0';
+  STATUS.innerText = 'No data collected';
   
   console.log('Tensors in memory: ' + tf.memory().numTensors);
 }
