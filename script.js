@@ -74,8 +74,8 @@ model.compile({
   optimizer: 'adam',
   // Use the correct loss function. If 2 classes of data, must use binaryCrossentropy.
   // Else categoricalCrossentropy is used if more than 2 classes.
-  loss: (CLASS_NAMES.length) === 2 ? 'binaryCrossentropy': 'categoricalCrossentropy', 
-  // As this is a classifcation problem you can record accuracy in the logs too!
+  loss: (CLASS_NAMES.length === 2) ? 'binaryCrossentropy': 'categoricalCrossentropy', 
+  // As this is a classification problem you can record accuracy in the logs too!
   metrics: ['accuracy']  
 });
 
