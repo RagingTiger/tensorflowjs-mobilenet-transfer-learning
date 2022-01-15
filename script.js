@@ -65,12 +65,14 @@ model.compile({
  * Loads the MobileNet model and warms it up so ready for use.
  **/
 async function loadMobileNetFeatureModel() {
-  mobilenet = await tf.loadGraphModel('https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1', {fromTFHub: true});
+  const URL = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1';
+  mobilenet = await tf.loadGraphModel(URL, {fromTFHub: true});
   STATUS.innerText = 'MobileNet v3 loaded successfully!';
   
   // Warm up the model by passing zeros through it once.
   tf.tidy(function () {
-    mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
+    let answer = mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
+    console.log(answer.shape);
   });
 }
 
