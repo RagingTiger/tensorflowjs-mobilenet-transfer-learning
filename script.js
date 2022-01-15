@@ -115,6 +115,16 @@ function enableCam() {
 
 
 /**
+ * Handle Data Gather for button mouseup/mousedown.
+ **/
+function gatherDataForClass() {
+  let classNumber = parseInt(this.getAttribute('data-class'));
+  gatherDataState = (gatherDataState === STOP_DATA_GATHER) ? classNumber : STOP_DATA_GATHER;
+  dataGatherLoop();
+}
+
+
+/**
  * When a button used to gather data is pressed, record feature vectors along with class type to arrays.
  **/
 function dataGatherLoop() {
@@ -150,16 +160,6 @@ function dataGatherLoop() {
 
     window.requestAnimationFrame(dataGatherLoop);
   }
-}
-
-
-/**
- * Handle Data Gather for button mouseup/mousedown.
- **/
-function gatherDataForClass() {
-  let classNumber = parseInt(this.getAttribute('data-class'));
-  gatherDataState = (gatherDataState === STOP_DATA_GATHER) ? classNumber : STOP_DATA_GATHER;
-  dataGatherLoop();
 }
 
 
