@@ -153,14 +153,13 @@ function dataGatherLoop() {
     if (examplesCount[gatherDataState] === undefined) {
       examplesCount[gatherDataState] = 0;
     }
-    
     // Increment counts of examples for user interface to show.
     examplesCount[gatherDataState]++;
+
     STATUS.innerText = '';
     for (let n = 0; n < CLASS_NAMES.length; n++) {
-      STATUS.innerText += 'Class 1 Data count: ' + examplesCount[0] + ', Class 2 Data count: ' + examplesCount[1];
+      STATUS.innerText += CLASS_NAMES[n] + ' data count: ' + examplesCount[n] + '. ';
     }
-    
 
     window.requestAnimationFrame(dataGatherLoop);
   }
