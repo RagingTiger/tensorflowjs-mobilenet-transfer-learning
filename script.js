@@ -124,6 +124,24 @@ function gatherDataForClass() {
 }
 
 
+function calculateFeaturesOnCurrentFrame() {
+  return tf.tidy(function() {
+    // Grab pixels from current VIDEO frame.
+    let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
+    // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
+    let resizedTensorFrame = tf.image.resizeBilinear(
+        videoFrameAsTensor, 
+        [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
+        true
+    );
+
+    let normalizedTensorFrame = resizedTensorFrame.div(255);
+
+    return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze();
+  });
+}
+
+
 /**
  * When a button used to gather data is pressed, record feature vectors along with class type to arrays.
  **/
@@ -131,20 +149,7 @@ function dataGatherLoop() {
   // Only gather data if webcam is on and a relevent button is pressed.
   if (videoPlaying && gatherDataState !== STOP_DATA_GATHER) {
     // Ensure tensors are cleaned up.
-    let imageFeatures = tf.tidy(function() {
-      // Grab pixels from current VIDEO frame.
-      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO);
-      // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
-      let resizedTensorFrame = tf.image.resizeBilinear(
-          videoFrameAsTensor, 
-          [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
-          true
-      );
-      
-      let normalizedTensorFrame = resizedTensorFrame.div(255);
-      
-      return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze();
-    });
+    let imageFeatures = calculateFeaturesOnCurrentFrame();
 
     trainingDataInputs.push(imageFeatures);
     trainingDataOutputs.push(gatherDataState);
@@ -207,20 +212,10 @@ function logProgress(epoch, logs) {
 function predictLoop() {
   if (predict) {
     tf.tidy(function() {
-      // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
-      let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
-      // Resize video frame tensor to be 224 x 224 pixels which is needed by MobileNet for input.
-      let resizedTensorFrame = tf.image.resizeBilinear(
-          videoFrameAsTensor, 
-          [MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH],
-          true
-      );
-
-      let imageFeatures = mobilenet.predict(resizedTensorFrame.expandDims());
-      let prediction = model.predict(imageFeatures).squeeze();
+      let imageFeatures = calculateFeaturesOnCurrentFrame();
+      let prediction = model.predict(imageFeatures.expandDims()).squeeze();
       let highestIndex = prediction.argMax().arraySync();
       let predictionArray = prediction.arraySync();
-
       STATUS.innerText = 'Prediction: ' + CLASS_NAMES[highestIndex] + ' with ' + Math.floor(predictionArray[highestIndex] * 100) + '% confidence';
     });
 
