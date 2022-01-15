@@ -18,8 +18,6 @@
 const STATUS = document.getElementById('status');
 const VIDEO = document.getElementById('webcam');
 const ENABLE_CAM_BUTTON = document.getElementById('enableCam');
-const CLASS_1_DATA_BUTTON = document.getElementById('class1Data');
-const CLASS_2_DATA_BUTTON = document.getElementById('class2Data');
 const RESET_BUTTON = document.getElementById('reset');
 const TRAIN_BUTTON = document.getElementById('train');
 const MOBILE_NET_INPUT_WIDTH = 224;
@@ -28,6 +26,8 @@ const STOP_DATA_GATHER = -1;
 const CLASS_NAMES = ['Class 1', 'Class 2'];
 
 ENABLE_CAM_BUTTON.addEventListener('click', enableCam);
+TRAIN_BUTTON.addEventListener('click', trainAndPredict);
+RESET_BUTTON.addEventListener('click', reset);
 
 let dataCollectorButtons = document.querySelectorAll('button.dataCollector');
 for (let i = 0; i < dataCollectorButtons.length; i++) {
@@ -35,8 +35,6 @@ for (let i = 0; i < dataCollectorButtons.length; i++) {
   dataCollectorButtons[i].addEventListener('mouseup', gatherDataForClass);
 }
 
-TRAIN_BUTTON.addEventListener('click', trainAndPredict);
-RESET_BUTTON.addEventListener('click', reset);
 
 let model = tf.sequential();
 model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
