@@ -174,7 +174,7 @@ async function trainAndPredict() {
   tf.util.shuffleCombo(trainingDataInputs, trainingDataOutputs);
 
   let outputsAsTensor = tf.tensor1d(trainingDataOutputs, 'int32');
-  let oneHotOutputs = tf.oneHot(outputsAsTensor, 2);
+  let oneHotOutputs = tf.oneHot(outputsAsTensor, CLASS_NAMES.length);
   let inputsAsTensor = tf.stack(trainingDataInputs);
   
   let results = await model.fit(inputsAsTensor, oneHotOutputs, {
@@ -205,7 +205,7 @@ function logProgress(epoch, logs) {
  *  Make live predictions from webcam once trained.
  **/
 function predictLoop() {
-  if(predict) {
+  if (predict) {
     tf.tidy(function() {
       // Grab pixels from current VIDEO frame, and then divide by 255 to normalize.
       let videoFrameAsTensor = tf.browser.fromPixels(VIDEO).div(255);
