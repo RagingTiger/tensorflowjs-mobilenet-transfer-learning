@@ -156,7 +156,11 @@ function dataGatherLoop() {
     
     // Increment counts of examples for user interface to show.
     examplesCount[gatherDataState]++;
-    STATUS.innerText = 'Class 1 Data count: ' + examplesCount[0] + ', Class 2 Data count: ' + examplesCount[1];
+    STATUS.innerText = '';
+    for (let n = 0; n < CLASS_NAMES.length; n++) {
+      STATUS.innerText += 'Class 1 Data count: ' + examplesCount[0] + ', Class 2 Data count: ' + examplesCount[1];
+    }
+    
 
     window.requestAnimationFrame(dataGatherLoop);
   }
