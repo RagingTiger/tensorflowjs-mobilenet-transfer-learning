@@ -49,19 +49,32 @@ let trainingDataInputs = [];
 let trainingDataOutputs = [];
 let examplesCount = [];
 let predict = false;
+let mobileNetBase = undefined;
+
+
+function customPrint(line) {
+  let p = document.createElement('p');
+  p.innerText = line;
+  document.body.appendChild(p);
+}
 
 
 /**
  * Loads the MobileNet model and warms it up so ready for use.
  **/
 async function loadMobileNetFeatureModel() {
-  const URL = 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
+  const URL = 'https://storage.googleapis.com/jmstore/TensorFlowJS/EdX/SavedModels/mobilenet-v1/model.json';
   mobilenet = await tf.loadLayersModel(URL);
   STATUS.innerText = 'MobileNet v1 loaded successfully!';
+  mobilenet.summary(null, null, customPrint);
+  
+  const layer = mobilenet.getLayer('conv_pw_13_relu');
+  const mobileNetBase = tf.model({inputs: mobilenet.inputs, outputs: layer.output}); 
+  mobileNetBase.summary();
   
   // Warm up the model by passing zeros through it once.
   tf.tidy(function () {
-    let answer = mobilenet.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
+    let answer = mobileNetBase.predict(tf.zeros([1, MOBILE_NET_INPUT_HEIGHT, MOBILE_NET_INPUT_WIDTH, 3]));
     console.log(answer.shape);
   });
 }
@@ -70,7 +83,8 @@ loadMobileNetFeatureModel();
 
 
 let model = tf.sequential();
-model.add(tf.layers.dense({inputShape: [1024], units: 128, activation: 'relu'}));
+model.add(tf.layers.flatten({inputShape: mobileNetBase.output.shape}));
+model.add(tf.layers.dense({units: 128, activation: 'relu'}));
 model.add(tf.layers.dense({units: CLASS_NAMES.length, activation: 'softmax'}));
 
 model.summary();
