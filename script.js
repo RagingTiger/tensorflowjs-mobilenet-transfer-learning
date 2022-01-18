@@ -55,9 +55,9 @@ let predict = false;
  * Loads the MobileNet model and warms it up so ready for use.
  **/
 async function loadMobileNetFeatureModel() {
-  const URL = 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v3_small_100_224/feature_vector/5/default/1';
-  mobilenet = await tf.loadGraphModel(URL, {fromTFHub: true});
-  STATUS.innerText = 'MobileNet v3 loaded successfully!';
+  const URL = 'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json';
+  mobilenet = await tf.loadLayersModel(URL);
+  STATUS.innerText = 'MobileNet v1 loaded successfully!';
   
   // Warm up the model by passing zeros through it once.
   tf.tidy(function () {
