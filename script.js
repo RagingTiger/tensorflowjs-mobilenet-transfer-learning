@@ -63,12 +63,12 @@ function customPrint(line) {
  * Loads the MobileNet model and warms it up so ready for use.
  **/
 async function loadMobileNetFeatureModel() {
-  const URL = 'https://storage.googleapis.com/jmstore/TensorFlowJS/EdX/SavedModels/mobilenet-v1/model.json';
+  const URL = 'https://storage.googleapis.com/jmstore/TensorFlowJS/EdX/SavedModels/mobilenet-v2/model.json';
   mobilenet = await tf.loadLayersModel(URL);
   STATUS.innerText = 'MobileNet v1 loaded successfully!';
   mobilenet.summary(null, null, customPrint);
   
-  const layer = mobilenet.getLayer('conv_pw_13_relu');
+  const layer = mobilenet.getLayer('Conv_1');
   mobileNetBase = tf.model({inputs: mobilenet.inputs, outputs: layer.output}); 
   mobileNetBase.summary();
   
@@ -83,8 +83,8 @@ loadMobileNetFeatureModel();
 
 
 let model = tf.sequential();
-model.add(tf.layers.flatten({inputShape: [7, 7, 256]}));
-model.add(tf.layers.dense({units: 128, activation: 'relu'}));
+model.add(tf.layers.flatten({inputShape: [7, 7, 1280]}));
+model.add(tf.layers.dense({units: 64, activation: 'relu'}));
 model.add(tf.layers.dense({units: CLASS_NAMES.length, activation: 'softmax'}));
 
 model.summary();
@@ -207,7 +207,7 @@ async function trainAndPredict() {
   let results = await model.fit(inputsAsTensor, oneHotOutputs, {
     shuffle: true,
     batchSize: 5,
-    epochs: 10,
+    epochs: 5,
     callbacks: {onEpochEnd: logProgress}
   });
   
