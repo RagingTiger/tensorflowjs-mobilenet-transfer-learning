@@ -69,7 +69,7 @@ async function loadMobileNetFeatureModel() {
   mobilenet.summary(null, null, customPrint);
   
   const layer = mobilenet.getLayer('conv_pw_13_relu');
-  const mobileNetBase = tf.model({inputs: mobilenet.inputs, outputs: layer.output}); 
+  mobileNetBase = tf.model({inputs: mobilenet.inputs, outputs: layer.output}); 
   mobileNetBase.summary();
   
   // Warm up the model by passing zeros through it once.
@@ -79,7 +79,7 @@ async function loadMobileNetFeatureModel() {
   });
 }
 
-loadMobileNetFeatureModel();
+loadMobileNetFeatureModel().then(function);
 
 
 let model = tf.sequential();
@@ -158,7 +158,7 @@ function calculateFeaturesOnCurrentFrame() {
 
     let normalizedTensorFrame = resizedTensorFrame.div(255);
 
-    return mobilenet.predict(normalizedTensorFrame.expandDims()).squeeze();
+    return mobileNetBase.predict(normalizedTensorFrame.expandDims()).squeeze();
   });
 }
 
