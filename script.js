@@ -65,7 +65,7 @@ function customPrint(line) {
 async function loadMobileNetFeatureModel() {
   const URL = 'https://storage.googleapis.com/jmstore/TensorFlowJS/EdX/SavedModels/mobilenet-v2/model.json';
   mobilenet = await tf.loadLayersModel(URL);
-  STATUS.innerText = 'MobileNet v1 loaded successfully!';
+  STATUS.innerText = 'MobileNet v2 loaded successfully!';
   mobilenet.summary(null, null, customPrint);
   
   const layer = mobilenet.getLayer('Conv_1');
