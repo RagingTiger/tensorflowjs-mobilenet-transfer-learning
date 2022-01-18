@@ -202,7 +202,6 @@ async function trainAndPredict() {
   let outputsAsTensor = tf.tensor1d(trainingDataOutputs, 'int32');
   let oneHotOutputs = tf.oneHot(outputsAsTensor, CLASS_NAMES.length);
   let inputsAsTensor = tf.stack(trainingDataInputs);
-  oneHotOutputs.print();
   
   let results = await model.fit(inputsAsTensor, oneHotOutputs, {
     shuffle: true,
