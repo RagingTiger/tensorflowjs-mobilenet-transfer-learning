@@ -157,7 +157,7 @@ function calculateFeaturesOnCurrentFrame() {
         true
     );
 
-    let normalizedTensorFrame = resizedTensorFrame.sub(127.5).div(127.5);
+    let normalizedTensorFrame = resizedTensorFrame.div(255);
 
     return mobileNetBase.predict(normalizedTensorFrame.expandDims()).squeeze();
   });
@@ -172,7 +172,7 @@ function dataGatherLoop() {
   if (videoPlaying && gatherDataState !== STOP_DATA_GATHER) {
     // Ensure tensors are cleaned up.
     let imageFeatures = calculateFeaturesOnCurrentFrame();
-  
+    
     trainingDataInputs.push(imageFeatures);
     trainingDataOutputs.push(gatherDataState);
     
