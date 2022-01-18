@@ -68,7 +68,7 @@ async function loadMobileNetFeatureModel() {
   STATUS.innerText = 'MobileNet v2 loaded successfully!';
   mobilenet.summary(null, null, customPrint);
   
-  const layer = mobilenet.getLayer('Conv_1');
+  const layer = mobilenet.getLayer('global_average_pooling2d_1');
   mobileNetBase = tf.model({inputs: mobilenet.inputs, outputs: layer.output}); 
   mobileNetBase.summary();
   
@@ -83,8 +83,8 @@ loadMobileNetFeatureModel();
 
 
 let model = tf.sequential();
-model.add(tf.layers.flatten({inputShape: [7, 7, 1280]}));
-model.add(tf.layers.dense({units: 64, activation: 'relu'}));
+//model.add(tf.layers.flatten({inputShape: [1000]}));
+model.add(tf.layers.dense({inputShape: [1280], units: 64, activation: 'relu'}));
 model.add(tf.layers.dense({units: CLASS_NAMES.length, activation: 'softmax'}));
 
 model.summary();
