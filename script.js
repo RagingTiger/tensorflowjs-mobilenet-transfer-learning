@@ -228,6 +228,7 @@ async function trainAndPredict() {
   });
   
   combinedModel.summary();
+  combinedModel.sa
   predictLoop();
 }
 
