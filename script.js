@@ -223,8 +223,11 @@ async function trainAndPredict() {
   combinedModel.add(model);
   
   combinedModel.compile({
-    
+    optimizer: 'adam',
+    loss: (CLASS_NAMES.length === 2) ? 'binaryCrossentropy': 'categoricalCrossentropy'
   });
+  
+  combinedModel.summary();
   predictLoop();
 }
 
