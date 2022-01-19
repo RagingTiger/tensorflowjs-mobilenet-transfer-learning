@@ -228,7 +228,7 @@ async function trainAndPredict() {
   });
   
   combinedModel.summary();
-  combinedModel.sa
+  await combinedModel.save('downloads://my-model');
   predictLoop();
 }
 
