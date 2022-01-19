@@ -215,6 +215,16 @@ async function trainAndPredict() {
   inputsAsTensor.dispose();
   
   predict = true;
+  
+  // Make combined model for download.
+  
+  let combinedModel = tf.sequential();
+  combinedModel.add(mobileNetBase);
+  combinedModel.add(model);
+  
+  combinedModel.compile({
+    
+  });
   predictLoop();
 }
 
