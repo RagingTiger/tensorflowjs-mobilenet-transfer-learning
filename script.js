@@ -227,6 +227,7 @@ async function trainAndPredict() {
     loss: (CLASS_NAMES.length === 2) ? 'binaryCrossentropy': 'categoricalCrossentropy'
   });
   
+  console.log(combinedModel.layers)
   combinedModel.summary();
   await combinedModel.save('downloads://my-model');
   predictLoop();
