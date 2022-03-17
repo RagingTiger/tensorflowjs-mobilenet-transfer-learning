@@ -16,7 +16,6 @@
  */
 
 /* CSS files add styling rules to your content */
-
 body {
   font-family: helvetica, arial, sans-serif;
   margin: 2em;
@@ -26,7 +25,6 @@ h1 {
   font-style: italic;
   color: #FF6F00;
 }
-
 
 video {
   clear: both;
